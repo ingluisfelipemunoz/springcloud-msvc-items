@@ -14,5 +14,5 @@ public interface ProductFeignClient {
     List<Product> findAll();
 
     @GetMapping("/{id}")
-    public Product getMethodName(@PathVariable Long id);
+    public Product details(@PathVariable Long id);
 }
