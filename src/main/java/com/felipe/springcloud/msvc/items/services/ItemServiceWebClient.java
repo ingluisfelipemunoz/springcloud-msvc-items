@@ -28,7 +28,7 @@ public class ItemServiceWebClient implements ItemService {
     @Override
     public List<Item> findAll() {
         return this.client.build()
-                .get().uri("http://msvc-products")
+                .get()
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToFlux(Product.class)
@@ -43,7 +43,7 @@ public class ItemServiceWebClient implements ItemService {
         try {
             return Optional.ofNullable(client.build()
                     .get()
-                    .uri("http://msvc-products/{id}", params)
+                    .uri("/{id}", params)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .bodyToMono(Product.class)
