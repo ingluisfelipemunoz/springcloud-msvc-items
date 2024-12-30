@@ -16,7 +16,7 @@ import com.felipe.springcloud.msvc.items.models.Item;
 import com.felipe.springcloud.msvc.items.models.Product;
 
 @Service
-@Primary
+// @Primary
 public class ItemServiceWebClient implements ItemService {
     private final WebClient.Builder client;
 
