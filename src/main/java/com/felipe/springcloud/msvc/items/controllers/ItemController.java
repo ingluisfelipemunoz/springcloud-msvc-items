@@ -3,14 +3,19 @@ package com.felipe.springcloud.msvc.items.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.felipe.springcloud.msvc.items.models.Item;
+import com.felipe.springcloud.msvc.items.models.Product;
 import com.felipe.springcloud.msvc.items.services.ItemService;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 public class ItemController {
-    private final ItemService service;
+    private final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
-    public ItemController(@Qualifier("itemServiceWebClient") ItemService service) {
+    private final ItemService service;
+    private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
+
+    public ItemController(@Qualifier("itemServiceWebClient") ItemService service,
+            CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
+        this.circuitBreakerFactory = circuitBreakerFactory;
         this.service = service;
     }
 
@@ -34,7 +44,10 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> details(@PathVariable() Long id) {
-        Optional<Item> itemOptional = service.findById(id);
+        Optional<Item> itemOptional = circuitBreakerFactory.create("items").run(() -> service.findById(id), e -> {
+            logger.error(e.getMessage());
+            return Optional.of(new Item(new Product(1L, "Default", 100D, LocalDate.now(), 80), 10));
+        });// service.findById(id);
         if (itemOptional.isPresent()) {
             return ResponseEntity.ok(itemOptional.get());
         }
