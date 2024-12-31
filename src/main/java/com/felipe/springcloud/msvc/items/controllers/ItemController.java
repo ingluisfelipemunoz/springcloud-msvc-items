@@ -7,12 +7,15 @@ import com.felipe.springcloud.msvc.items.services.ItemService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 public class ItemController {
@@ -23,7 +26,9 @@ public class ItemController {
     }
 
     @GetMapping()
-    public List<Item> list() {
+    public List<Item> list(@RequestHeader(name = "token-request", required = false) String header,
+            @RequestParam(name = "name", required = false) String name) {
+        System.out.println("Name: " + name + " Token: " + header);
         return service.findAll();
     }
 
