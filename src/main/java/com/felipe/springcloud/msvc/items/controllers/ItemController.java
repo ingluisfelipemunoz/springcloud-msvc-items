@@ -6,6 +6,8 @@ import com.felipe.springcloud.msvc.items.models.Item;
 import com.felipe.springcloud.msvc.items.models.Product;
 import com.felipe.springcloud.msvc.items.services.ItemService;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +44,18 @@ public class ItemController {
         return service.findAll();
     }
 
+    @CircuitBreaker(name = "items", fallbackMethod = "getFallBackMethodProduct")
+    @GetMapping("/details/{id}")
+    public ResponseEntity<?> detailsCb(@PathVariable() Long id) {
+        Optional<Item> itemOptional = service.findById(id);
+        if (itemOptional.isPresent()) {
+            return ResponseEntity.ok(itemOptional.get());
+        }
+        return ResponseEntity.status(404)
+                .body(Collections
+                        .singletonMap("message", "Product not found in product microservice"));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> details(@PathVariable() Long id) {
         Optional<Item> itemOptional = circuitBreakerFactory.create("items").run(() -> service.findById(id), e -> {
@@ -54,5 +68,10 @@ public class ItemController {
         return ResponseEntity.status(404)
                 .body(Collections
                         .singletonMap("message", "Product not found in product microservice"));
+    }
+
+    public ResponseEntity<?> getFallBackMethodProduct(Throwable e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.ok(new Item(new Product(1L, "Default", 100D, LocalDate.now(), 80), 10));
     }
 }
