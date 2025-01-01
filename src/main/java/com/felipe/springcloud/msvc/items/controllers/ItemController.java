@@ -58,7 +58,8 @@ public class ItemController {
                         .singletonMap("message", "Product not found in product microservice"));
     }
 
-    @TimeLimiter(name = "items", fallbackMethod = "getFallBackMethodProduct2")
+    @CircuitBreaker(name = "items", fallbackMethod = "getFallBackMethodProduct2")
+    @TimeLimiter(name = "items")
     @GetMapping("/details2/{id}")
     public CompletableFuture<?> detailsCbRateLimiter(@PathVariable() Long id) {
         return CompletableFuture.supplyAsync(() -> {
