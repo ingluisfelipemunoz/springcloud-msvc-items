@@ -58,7 +58,7 @@ public class ItemController {
                         .singletonMap("message", "Product not found in product microservice"));
     }
 
-    @TimeLimiter(name = "items")
+    @TimeLimiter(name = "items", fallbackMethod = "getFallBackMethodProduct2")
     @GetMapping("/details2/{id}")
     public CompletableFuture<?> detailsCbRateLimiter(@PathVariable() Long id) {
         return CompletableFuture.supplyAsync(() -> {
@@ -89,5 +89,12 @@ public class ItemController {
     public ResponseEntity<?> getFallBackMethodProduct(Throwable e) {
         logger.error(e.getMessage());
         return ResponseEntity.ok(new Item(new Product(1L, "Default", 100D, LocalDate.now(), 80), 10));
+    }
+
+    public CompletableFuture<?> getFallBackMethodProduct2(Throwable e) {
+        return CompletableFuture.supplyAsync(() -> {
+            logger.error(e.getMessage());
+            return ResponseEntity.ok(new Item(new Product(1L, "Default", 100D, LocalDate.now(), 80), 10));
+        });
     }
 }
