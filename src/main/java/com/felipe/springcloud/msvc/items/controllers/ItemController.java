@@ -7,12 +7,14 @@ import com.felipe.springcloud.msvc.items.models.Product;
 import com.felipe.springcloud.msvc.items.services.ItemService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,20 @@ public class ItemController {
         return ResponseEntity.status(404)
                 .body(Collections
                         .singletonMap("message", "Product not found in product microservice"));
+    }
+
+    @TimeLimiter(name = "items")
+    @GetMapping("/details2/{id}")
+    public CompletableFuture<?> detailsCbRateLimiter(@PathVariable() Long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            Optional<Item> itemOptional = service.findById(id);
+            if (itemOptional.isPresent()) {
+                return ResponseEntity.ok(itemOptional.get());
+            }
+            return ResponseEntity.status(404)
+                    .body(Collections
+                            .singletonMap("message", "Product not found in product microservice"));
+        });
     }
 
     @GetMapping("/{id}")
