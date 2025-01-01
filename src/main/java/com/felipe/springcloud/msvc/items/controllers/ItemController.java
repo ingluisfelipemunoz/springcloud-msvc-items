@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,13 +36,16 @@ public class ItemController {
     private final ItemService service;
     private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
 
+    private final Environment env;
+
     @Value("${config.text}")
     private String text;
 
     public ItemController(@Qualifier("itemServiceWebClient") ItemService service,
-            CircuitBreakerFactory<?, ?> circuitBreakerFactory) {
+            CircuitBreakerFactory<?, ?> circuitBreakerFactory, Environment env) {
         this.circuitBreakerFactory = circuitBreakerFactory;
         this.service = service;
+        this.env = env;
     }
 
     @GetMapping("/fetch-configs")
@@ -51,6 +55,11 @@ public class ItemController {
         json.put("port", port);
         logger.info("port: " + port);
         logger.info("text: " + text);
+        if (env.getActiveProfiles().length > 0 && env.getActiveProfiles()[0].equals("dev")) {
+            json.put("author.name", env.getProperty("config.author.name"));
+            json.put("author.email", env.getProperty("config.author.email"));
+            json.put("env", env.getActiveProfiles()[0]);
+        }
         return ResponseEntity.ok(json);
     }
 
