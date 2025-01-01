@@ -23,6 +23,8 @@ public class AppConfig {
                             .failureRateThreshold(50)
                             .waitDurationInOpenState(Duration.ofSeconds(10L))
                             .permittedNumberOfCallsInHalfOpenState(5)
+                            .slowCallDurationThreshold(Duration.ofSeconds(2L))
+                            .slowCallRateThreshold(50)
                             .build())
                     .timeLimiterConfig(TimeLimiterConfig.custom()
                             .timeoutDuration(Duration.ofSeconds(3L)).build())
