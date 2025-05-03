@@ -3,7 +3,7 @@ package com.felipe.springcloud.msvc.items.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.felipe.springcloud.msvc.items.models.Item;
-import com.felipe.springcloud.msvc.items.models.Product;
+import com.felipe.libs.msvc.commons.entities.Product;
 import com.felipe.springcloud.msvc.items.services.ItemService;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;

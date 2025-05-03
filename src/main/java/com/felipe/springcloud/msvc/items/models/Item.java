@@ -1,5 +1,7 @@
 package com.felipe.springcloud.msvc.items.models;
 
+import com.felipe.libs.msvc.commons.entities.Product;
+
 public class Item {
     private Product product;
     private int quantity;

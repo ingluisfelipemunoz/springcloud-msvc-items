@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.Builder;
 
 import com.felipe.springcloud.msvc.items.models.Item;
-import com.felipe.springcloud.msvc.items.models.Product;
+import com.felipe.libs.msvc.commons.entities.Product;
 
 @Service
 // @Primary
